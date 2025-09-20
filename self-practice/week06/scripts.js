@@ -1,7 +1,7 @@
+// Lesson 1: Arrays, Objects, and Functions
+
 // 1. Create an empty array to hold the quotes
 const quotes = []
-
-------------------------------
 
 /*
   2. Function: addQuote
@@ -12,10 +12,6 @@ function addQuote(quote) {
   // TODO: Add the quote object to the quotes array
   quotes.push(quote)
 }
-
-เพิ่ม quote เข้าไปที่ท้ายอาเรย์
-
-------------------------------
 
 /*
   3. Function: deleteQuote
@@ -33,15 +29,6 @@ function deleteQuote(id) {
   }
 }
 
-ใช้ findIndex หา index ของobjที่ quote.id === id
-ถ้าเจอ (index !== -1) จะใช้ splice(index,1) เพื่อลบตัวนั้นที่เจอ
-(index !== -1) ปกติแล้วถ้าหาไม่เจอมันจะคืนค่าเป็น -1 แต่ตอนนี้ผมใช้ !== ทำให้เป็นเงื่อนไขว่าถ้าไม่ใช่ -1 ก็คือ 1(findIndex เจอสิ่งที่ระบุเข้าไป)
-
-จริงๆผมคิดว่าอาาจะใช้ filter ก็ได้
-quotes = quotes.filter(q => q.id !== id)
-
-------------------------------
-
 /*
   4. Function: updateQuote
   - Accepts an id and an object with new content and/or author
@@ -55,11 +42,6 @@ function updateQuote(id, updatedQuote) {
 }
 }
 
-condition ของข้อนี้เหมือนกับข้อ 4 แต่ภายใต้ if จะเป็นคนละอันคือข้อนี้จะให้ update quote กับ given id
-โดยผมจะใช้ spread operator เพื่อทำการ merge obj ของ quotes[index] กับ updatedQuote ที่เพิ่งเอาเข้ามาในฟังก์ชันนี้
-
-------------------------------
-
 /*
   5. Function: getAllQuotes
   - Returns all quotes in the array
@@ -68,8 +50,6 @@ function getAllQuotes() {
   // TODO: Return the quotes array
   return quotes
 }
-
-------------------------------
 
 // 6. Test your functions below
 // TODO: Add 3 quotes using addQuote()
