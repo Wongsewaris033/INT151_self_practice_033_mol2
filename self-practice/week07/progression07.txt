@@ -1,0 +1,30 @@
+const p = document.createElement("p");
+p.setAttribute("format", "italic");
+// createElement 'p' ขึ้นมาและ setAttribute ให้ format เป็น italic
+ 
+const p1 = document.createElement("p");
+p1.innerHTML = "<i>Sample Italic Text</i>"; // innerHTML จะ ตีความ HTML tag จริง
+p1.setAttribute("method", "innerHTML");
+// ข้อความจะออกมาเป็น ตัวเอียง เพราะ <i> ทำงานจริง อิงแท็ก i จาก HTML tag
+ 
+const p2 = document.createElement("p");
+p2.innerText = "<i>Sample Italic Text</i>"; // innerText จะ แสดงข้อความตามที่เขียนในโค้ด
+p2.setAttribute("method", "innerText");
+// มันจะไม่ตีความ <i> เป็นแท็ก
+ 
+const p3 = document.createElement("p");
+p3.textContent = "<i>Sample Italic Text</i>";  textContent คล้าย innerText แต่จะ ไม่สนใจการจัดรูปแบบหรือซ่อนข้อความใน CSS
+p3.setAttribute("method", "textContent");
+ 
+const div = document.getElementById("demo"); // เอา <p> ทั้งหมด 4 ตัวที่สร้างไว้ ไปแสดงใน <div> ที่มี id ว่า “demo”
+div.appendChild(p);
+div.appendChild(p1);
+div.appendChild(p2);
+div.appendChild(p3);
+// appendChild เป็นลูกตัวสุดท้ายเพราะ append คือการเพิ่มobjเข้าไปตัวสุดท้าย
+
+//--------------------
+
+innerHTML = จะเข้าใจ syntax ของ html
+innerText = จะได้ข้อความที่userมองเห็น แต่ยังเข้าใจcss เช่น "display:none" มันก็จะไม่แสดงส่วนนั้นออกมาแต่จะแสดงที่เหลือนอกเหนือจะตรงที่ใส่"display:none"ออกมาทั้งหมด
+textContent = ไม่เข้าใจ syntax อะไรทั้งนั้น / มองทุกอย่างเป็น character เช่น <p> ก็จะมองเป็นเครื่องหมายน้อยกว่า , text 'p' , เครื่องหมายมากกว่า
