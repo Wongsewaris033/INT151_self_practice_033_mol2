@@ -1,0 +1,101 @@
+const nodes = document.querySelector("appetizer").childNodes;
+console.log(nodes);
+
+const nodes = document.getElementById("appetizer").childNodes;
+console.log(nodes);
+
+//querySelectorAll : return ทุก element ที่matchกับสิ่งที่ระบุ / return node list ไม่ได้ returnเป็นarray
+//querySelector : ได้ผลลัพธ์ first element ที่เป็น descendant
+//getElementById : ได้ first object ถ้าไม่เจอ id ที่เราระบุจะ return "null"
+//("appetizer") : css selector
+
+<< css selector >>
++ (Next-sibling combinator)
+> (Child combinator)
+~ (Subsequent sibling combinator)
+" " (Descendant combinator)
+| (Namespace separator)
+, (Selector list)
+. (Class)
+# (Id)
+
+//--------------------
+
+*Array.from : เป็นฟังก์ชันทำให้ array like เป็น Array*
+
+const soup = document.querySelectorAll(".meat");
+soup.forEach((s) => {
+    if (s.textContent.toLowerCase().includes("soup")){
+        console.log(s)
+    }
+})
+//ข้อนี้จะเป็นการใช้ forEach เพื่อหาตามที่โจทย์กำหนด
+
+const meatAllElement = document.querySelectorAll(".meat")
+ 
+const meatSoupElements = Array.from(meatAllElement).filter(ele =>
+  ele.textContent.toLowerCase().includes("soup")
+)
+console.log(meatSoupElements)
+//แต่ข้อนี้จะเป็นการใช้ Array.from คือปกติแล้ว ถ้าเรา querySelectorAll มันจะได้ค่ามาเป็น node list ซึ่งเป็น Array like
+ถ้าเราต้องการจะใช้มันเป็นarray เราต้องใช้ Array.from เพื่อทำให้เป็นarray
+
+//--------------------
+
+const soupElement = document.querySelector("#soup");
+ 
+let current = soupElement.firstElementChild
+
+while (current !== null) {
+    console.log(current)
+    current = current.nextElementSibling //หา node ไปทางแนวนอน
+}
+
+//--------------------
+
+const first = document.querySelector('#appetizer, #soup') //หา node ตัวแรกที่เจอไม่ว่าจะเป็น #appetizer, #soup
+console.log(first)
+
+const appMeat = document.querySelectorAll('#appetizer .meat') //เอา meat element ที่อยู่ภายใต้ #appetizer
+const soupMeat = document.querySelectorAll('#soup .meat') //เอา meat element ที่อยู่ภายใต้ #soup
+const allMeat = [...appMeat,...soupMeat] //เอาสิ่งที่ได้จากการ querySelectorAll มาใส่
+
+allMeat.forEach((all) => console.log(all.textContent)) ให้รันออกมาทั้งหมดจากตัวแปร allMeat ที่เก็ยค่าเอาไว้ก่อนหน้านี้
+
+//--------------------
+
+const buttons = document.getElementsByTagName("button") //ดึง ทุกปุ่ม (<button>) ที่อยู่ในหน้าเว็บมาเป็น HTMLCollection
+Array.from(buttons).forEach((button) => { //ใช้ Array.from เพื่อแปลงจาก array.like --> array
+  button.addEventListener("click", () => { //ผูก (add event listener) ฟังก์ชันให้ทำงานเมื่อคลิก
+    if (button.id === "add") {
+        box.classList.add("bordered"); //ถ้า id เป็น "add" -> เพิ่ม class "bordered" ให้กับ element ที่ชื่อ box
+      }
+      else if (button.id === "remove") {
+        box.classList.remove("bordered"); //ถ้า id เป็น "remove" -> ลบ class "bordered" ออก
+      }
+      else if (button.id === "toggle") {
+        box.classList.toggle("bordered"); //ถ้า id เป็น "toggle" -> สลับระหว่างมี/ไม่มี class "bordered"
+      }
+  })
+})
+
+//--------------------
+
+const buttons = document.getElementsByTagName("button")
+const box = document.getElementById("box");
+Array.from(buttons).forEach((button) => {
+  button.addEventListener("click", () => {
+    const color = button.dataset.color; //ดึงค่าจาก data attribute ของปุ่มนั้น(เข้าถึงผ่าน button.dataset.color)
+    if (color === "red") {
+        box.style.backgroundColor = "red";
+      }
+      else if (color=== "blue") {
+        box.style.backgroundColor = "blue";
+      }
+      else if (color === "green") {
+        box.style.backgroundColor = "green";
+      }
+  })
+})
+
+//--------------------
