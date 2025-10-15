@@ -1,0 +1,139 @@
+import { addQuote, deleteQuote, updateQuote, getAllQuotes } from "./quote.js";
+
+let quotes = getAllQuotes();
+
+const quoteList = document.getElementById("quote-list");
+const form = document.getElementById("quoteForm");
+const contentInput = document.getElementById("content");
+const authorInput = document.getElementById("author");
+const idInput = document.getElementById("quoteId");
+const randomBtn = document.getElementById("randomBtn");
+const randomDisplay = document.getElementById("randomQuoteDisplay");
+
+function createQuoteElement(quote) {
+  const div = document.createElement("div");
+  div.dataset.id = quote.id;
+
+  const contentP = document.createElement("p");
+  contentP.textContent = quote.content;
+
+  const authorP = document.createElement("p");
+  authorP.textContent = quote.author;
+
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.classList.add("edit-btn");
+  editBtn.dataset.id = quote.id;
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete";
+  deleteBtn.classList.add("delete-btn");
+  deleteBtn.dataset.id = quote.id;
+
+  div.appendChild(contentP);
+  div.appendChild(authorP);
+  div.appendChild(editBtn);
+  div.appendChild(deleteBtn);
+
+  return div;
+}
+//สร้าง <div> หนึ่งอันที่เก็บ quote แต่ละรายการ
+
+function addQuoteToDOM(quote) {
+  const quoteEl = createQuoteElement(quote);
+  quoteList.appendChild(quoteEl);
+}
+//ใช้ตอนเพิ่ม quote ใหม่ — สร้าง <div> ด้วย createQuoteElement() แล้วนำไปต่อท้ายในส่วน #quote-list
+
+function updateQuoteInDOM(quote) {
+  const div = quoteList.querySelector(`div[data-id='${quote.id}']`); //หา <div> ที่มี data-id ตรงกับ quote ที่แก้
+  if (div) {
+    const ps = div.querySelectorAll("p"); //เปลี่ยนข้อความ <p> ทั้งสอง (เนื้อหาและผู้เขียน)
+    ps[0].textContent = quote.content;
+    ps[1].textContent = quote.author;
+  }
+}
+//ใช้ตอน “แก้ไข quote” แล้วต้องอัปเดตข้อความในหน้าจอให้ตรงกับข้อมูลใหม่
+
+function deleteQuoteFromDOM(id) {
+  const div = quoteList.querySelector(`div[data-id='${id}']`);
+  if (div) {
+    div.remove();
+  }
+}
+//ใช้ตอนลบ quote — หาว่า <div> ไหนมี data-id ตรงกับที่ต้องการ แล้วเอาออกจาก DOM
+
+function renderQuotes() { //ใช้ตอนโหลดหน้าเว็บ หรือหลังจากรีเซ็ตข้อมูล
+  quoteList.innerHTML = ""; //ล้างข้อมูลเก่าทั้งหมด
+  quotes = getAllQuotes(); //ดึง quotes ปัจจุบันจาก quote.js
+  quotes.forEach((quote) => addQuoteToDOM(quote)); //วนลูปเพิ่มทุกอันเข้า DOM
+}
+
+function showRandomQuote() { //ใช้ตอนกดปุ่ม “Show Random Quote”
+  const allQuotes = getAllQuotes(); //ดึง quotes ทั้งหมด
+  if (allQuotes.length === 0) { 
+    randomDisplay.textContent = "No quotes available.";
+    return;
+  }
+  const randomIndex = Math.floor(Math.random() * allQuotes.length);
+  const randomQuote = allQuotes[randomIndex];
+  randomDisplay.textContent = `"${randomQuote.content}" — ${randomQuote.author}`; //แสดงผลเป็นข้อความตรง <div id="randomQuoteDisplay">
+}
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const id = Number(idInput.value);
+  const content = contentInput.value.trim();
+  const author = authorInput.value.trim();
+
+  if (!content || !author) return;
+
+  if (id) {
+    const updated = updateQuote(id, content, author);
+    updateQuoteInDOM(updated);
+  } else {
+    const newQuote = addQuote(content, author);
+    addQuoteToDOM(newQuote);
+  }
+
+  quotes = getAllQuotes();
+  form.reset();
+  idInput.value = "";
+});
+//ป้องกันไม่ให้ฟอร์ม reload หน้า
+จากนั้นเช็กว่า:
+ -ถ้ามีค่า id → แก้ไข quote ที่มีอยู่ (updateQuote)
+ -ถ้าไม่มี id → เพิ่ม quote ใหม่ (addQuote)
+หลังจากนั้น:
+ -อัปเดตข้อมูลในตัวแปร quotes
+ -เคลียร์ฟอร์ม (form.reset())
+ -ล้างค่า idInput (idInput.value = "")
+
+quoteList.addEventListener("click", (e) => {
+  const target = e.target;
+  const id = Number(target.dataset.id);
+
+  if (target.classList.contains("edit-btn")) {
+    quotes = getAllQuotes();
+    const quote = quotes.find((q) => q.id === id);
+    if (quote) {
+      contentInput.value = quote.content;
+      authorInput.value = quote.author;
+      idInput.value = quote.id;
+    }
+  }
+
+  if (target.classList.contains("delete-btn")) {
+    deleteQuote(id);
+    deleteQuoteFromDOM(id);
+    quotes = getAllQuotes();
+  }
+});
+//ใช้ “Event Delegation” — แทนที่จะใส่ listener ให้ปุ่มทุกปุ่ม เราใส่แค่ quoteList อันเดียว แล้วเช็กว่า user คลิกปุ่มไหน
+ -ถ้าคลิก “Edit” → ดึงข้อมูลจาก quotes แล้วใส่ในฟอร์มเพื่อให้ user แก้ไขได้
+ -ถ้าคลิก “Delete” → ลบข้อมูลจากทั้ง array (deleteQuote()) และ DOM (deleteQuoteFromDOM())
+
+randomBtn.addEventListener("click", showRandomQuote); //เมื่อคลิกปุ่ม “Show Random Quote” จะเรียกฟังก์ชัน showRandomQuote()
+
+renderQuotes(); //ตอนเปิดหน้าเว็บครั้งแรก จะเรียก renderQuotes() เพื่อแสดง quote ทั้งหมดที่มีอยู่ในระบบ

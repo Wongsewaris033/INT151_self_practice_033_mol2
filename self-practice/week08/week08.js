@@ -78,7 +78,7 @@ const buttons = document.getElementsByTagName("button")
 const box = document.getElementById("box");
 Array.from(buttons).forEach((button) => {
   button.addEventListener("click", () => {
-    const color = button.dataset.color;
+    const color = button.dataset.color; //ดึงค่าจาก data attribute ของปุ่มนั้น(เข้าถึงผ่าน button.dataset.color)
     if (color === "red") {
         box.style.backgroundColor = "red";
       }
