@@ -9,6 +9,7 @@ const authorInput = document.getElementById("author");
 const idInput = document.getElementById("quoteId");
 const randomBtn = document.getElementById("randomBtn");
 const randomDisplay = document.getElementById("randomQuoteDisplay");
+//ดึง element จาก id ที่ได้กำหนดไว้
 
 function createQuoteElement(quote) {
   const div = document.createElement("div");
@@ -21,9 +22,9 @@ function createQuoteElement(quote) {
   authorP.textContent = quote.author;
 
   const editBtn = document.createElement("button");
-  editBtn.textContent = "Edit";
-  editBtn.classList.add("edit-btn");
-  editBtn.dataset.id = quote.id;
+  editBtn.textContent = "Edit"; //ตั้งข้อความภายในปุ่มให้แสดงคำว่า “Edit”
+  editBtn.classList.add("edit-btn"); //เพิ่ม class ชื่อ edit-btn ให้ปุ่ม -> ใช้ CSS จัดสไตล์เฉพาะปุ่ม Edit ได้ / ใช้ JS ตรวจจับว่าuserกดปุ่มEditไหม (.classList.contains("edit-btn"))
+  editBtn.dataset.id = quote.id; //กำหนด data attribute (data-id="...") ให้ปุ่ม -> เก็บค่า id ของ quote เอาไว้
 
   const deleteBtn = document.createElement("button");
   deleteBtn.textContent = "Delete";
@@ -34,6 +35,7 @@ function createQuoteElement(quote) {
   div.appendChild(authorP);
   div.appendChild(editBtn);
   div.appendChild(deleteBtn);
+  //เพิ่มnode ลูกเข้าไปใน node แม่ (ตำแหน่งท้ายสุด)
 
   return div;
 }
@@ -49,8 +51,8 @@ function updateQuoteInDOM(quote) {
   const div = quoteList.querySelector(`div[data-id='${quote.id}']`); //หา <div> ที่มี data-id ตรงกับ quote ที่แก้
   if (div) {
     const ps = div.querySelectorAll("p"); //เปลี่ยนข้อความ <p> ทั้งสอง (เนื้อหาและผู้เขียน)
-    ps[0].textContent = quote.content;
-    ps[1].textContent = quote.author;
+    ps[0].textContent = quote.content; // <p> แรก = เนื้อหา
+    ps[1].textContent = quote.author; // <p> ที่สอง = ผู้เขียน
   }
 }
 //ใช้ตอน “แก้ไข quote” แล้วต้องอัปเดตข้อความในหน้าจอให้ตรงกับข้อมูลใหม่
@@ -75,19 +77,19 @@ function showRandomQuote() { //ใช้ตอนกดปุ่ม “Show Rand
     randomDisplay.textContent = "No quotes available.";
     return;
   }
-  const randomIndex = Math.floor(Math.random() * allQuotes.length);
+  const randomIndex = Math.floor(Math.random() * allQuotes.length); //Math.floor -> ปัดเศษลงเป็นจำนวนเต็ม / Math.random() -> สุ่มตัวเลขทศนิยมระหว่าง 0 ถึง < 1 / ถ้า allQuotes.length เท่ากับ 5 -> ค่าที่ได้จะอยู่ระหว่าง 0 ถึง < 5
   const randomQuote = allQuotes[randomIndex];
   randomDisplay.textContent = `"${randomQuote.content}" — ${randomQuote.author}`; //แสดงผลเป็นข้อความตรง <div id="randomQuoteDisplay">
 }
 
 form.addEventListener("submit", (e) => {
-  e.preventDefault();
+  e.preventDefault(); //ไม่ให้ form ทำตามปกติของมัน(เช่น refresh หน้าเว็บ หรือส่งข้อมูลไป server) เพราะผมจะจัดการเองด้วยJS
 
-  const id = Number(idInput.value);
+  const id = Number(idInput.value); //ใช้เก็บ id ของ quote ที่กำลังแก้ไข ถ้าไม่มีค่า แสดงว่าเป็นการ เพิ่ม quote ใหม่
   const content = contentInput.value.trim();
   const author = authorInput.value.trim();
 
-  if (!content || !author) return;
+  if (!content || !author) return; ถ้าใส่ไม่ครบ (ช่องไหนว่าง) -> หยุดทำงานทันที
 
   if (id) {
     const updated = updateQuote(id, content, author);
@@ -98,13 +100,13 @@ form.addEventListener("submit", (e) => {
   }
 
   quotes = getAllQuotes();
-  form.reset();
-  idInput.value = "";
+  form.reset(); //ล้างค่าทั้งหมดในฟอร์ม
+  idInput.value = ""; //เคลียร์ค่า id (เพื่อให้ครั้งต่อไปเป็น “เพิ่มใหม่” ไม่ใช่ “แก้ไข”)
 });
 //ป้องกันไม่ให้ฟอร์ม reload หน้า
 จากนั้นเช็กว่า:
- -ถ้ามีค่า id → แก้ไข quote ที่มีอยู่ (updateQuote)
- -ถ้าไม่มี id → เพิ่ม quote ใหม่ (addQuote)
+ -ถ้ามีค่า id -> แก้ไข quote ที่มีอยู่ (updateQuote)
+ -ถ้าไม่มี id -> เพิ่ม quote ใหม่ (addQuote)
 หลังจากนั้น:
  -อัปเดตข้อมูลในตัวแปร quotes
  -เคลียร์ฟอร์ม (form.reset())
@@ -112,15 +114,15 @@ form.addEventListener("submit", (e) => {
 
 quoteList.addEventListener("click", (e) => {
   const target = e.target;
-  const id = Number(target.dataset.id);
+  const id = Number(target.dataset.id); //ดึงค่า data-id ที่เก็บอยู่ในปุ่ม (กำหนดไว้ตอนสร้างปุ่มใน createQuoteElement)
 
-  if (target.classList.contains("edit-btn")) {
+  if (target.classList.contains("edit-btn")) { //ตรวจว่าปุ่มที่ถูกคลิกเป็นปุ่ม “Edit” หรือไม่
     quotes = getAllQuotes();
-    const quote = quotes.find((q) => q.id === id);
+    const quote = quotes.find((q) => q.id === id); //หาว่า quote ไหนมี id ตรงกับปุ่มที่คลิก
     if (quote) {
-      contentInput.value = quote.content;
-      authorInput.value = quote.author;
-      idInput.value = quote.id;
+      contentInput.value = quote.content; //เติมข้อความ quote เดิม
+      authorInput.value = quote.author; //เติมชื่อผู้เขียน
+      idInput.value = quote.id; //เก็บ id ไว้ (จะใช้ตอนกด Save)
     }
   }
 

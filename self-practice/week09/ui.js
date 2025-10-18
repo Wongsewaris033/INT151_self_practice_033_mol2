@@ -122,3 +122,5 @@ quoteList.addEventListener("click", (e) => {
 randomBtn.addEventListener("click", showRandomQuote);
 
 renderQuotes();
+
+//จากโจทย์ที่อาจารย์assignไว้ในห้องให้กลับมาทำ
