@@ -1,0 +1,75 @@
+const form = document.getElementById('styleForm');
+const bg = document.getElementById('bgColor');
+const fontColor = document.getElementById('fontColor');
+const fontSize = document.getElementById('fontSize');
+const example = document.getElementById('example-text');
+//document.getElementById()เข้าถึง element ใน html ตามid
+
+function applyStyle(bgColor, color, size) { //ใช้ฟังก์ชันนี้เพื่อ เปลี่ยนสไตล์ของหน้าเว็บตามค่าที่เลือก
+  document.body.style.backgroundColor = bgColor; //เข้าถึง <body> แล้วเปลี่ยนสีพื้นหลัง
+  example.style.color = color; //เปลี่ยนสีตัวอักษรของ element example
+  example.style.fontSize =
+    size === 'small' ? '14px' : //ถ้า size เป็น 'small' ใช้ 14px
+    size === 'medium' ? '20px' : '28px'; //ถ้า 'medium' -> 20px / ถ้าไม่ใช่ทั้งสอง -> 28px (ถือว่าเป็น 'large')
+}
+
+window.addEventListener('DOMContentLoaded', () => { //รอฟัง event 'DOMContentLoaded' ซึ่งจะทำงานเมื่อhtm; ทั้งหมดโหลดเสร็จแล้ว
+  const saved = JSON.parse(localStorage.getItem('styleSettings')); //อ่านข้อมูลจาก localStorage ที่เก็บไว้ก่อนหน้านี้ / localStorage.getItem('styleSettings') จะดึงค่าที่เคยบันทึกในคีย์ 'styleSettings' (เป็น string) / JSON.parse() แปลง string นั้นกลับมาเป็น obj
+  if (saved) { //เช็กว่ามีข้อมูลอยู่จริงหรือไม่(ไม่เป็น null) / ถ้าเคยบันทึกไว้ จะเข้าบล็อกนี้
+    bg.value = saved.bgColor;
+    fontColor.value = saved.fontColor;
+    fontSize.value = saved.fontSize;
+    applyStyle(saved.bgColor, saved.fontColor, saved.fontSize); //ใช้ฟังก์ชัน applyStyle() เพื่อใช้ค่าสีและขนาดที่ใส่ๆเข้ามานี้กับหน้าเว็บทันที (ทำให้พอเปิดเว็บใหม่ จะมีลักษณะเหมือนที่เคยsaveไว้)
+  }
+});
+
+[bg, fontColor, fontSize].forEach(select => {
+  select.addEventListener('change', () => { //ให้แต่ละ input/select ฟัง event 'change' (ทุกครั้งที่ีuserเปลี่ยนค่า)
+    applyStyle(bg.value, fontColor.value, fontSize.value); //พอเกิดขึ้นจะเรียก applyStyle()ทันทีโดยใช้ค่าปัจจุบันจากทั้งสามช่อง
+  });
+});
+
+form.addEventListener('submit', e => {
+  e.preventDefault(); //ป้องกันไม่ให้ฟอร์มส่งข้อมูลไปยังserver (เพราะจะจัดการเองในjs)
+  localStorage.setItem('styleSettings', JSON.stringify({ //JSON.stringify() เพื่อแปลงเป็น string แล้วบันทึกลงlocalStorage ในชื่อ 'styleSettings'
+    bgColor: bg.value,
+    fontColor: fontColor.value,
+    fontSize: fontSize.value
+  }));
+});
+
+form.addEventListener('reset', () => {
+  setTimeout(() => { //ใช้ setTimeout(..., 0) เพื่อรอให้browserทำการ“รีเซ็ตค่า input”กลับไปก่อน (เพราะresetจะเกิดก่อนjs) -> หลังจากนั้นจึงค่อยทำคำสั่งของเรา
+    localStorage.removeItem('styleSettings'); //ลบข้อมูล 'styleSettings' ออกจาก localStorage -> ล้างค่าที่เคยบันทึกไว้
+    bg.value = 'white';
+    fontColor.value = 'black';
+    fontSize.value = 'small';
+    applyStyle('white', 'black', 'small'); //ตั้งค่า input ทั้งหมดให้กลับไปเป็นค่าเริ่มต้น / applyStyle() เพื่อให้หน้าเว็บเปลี่ยนสไตล์กลับเป็นค่าเริ่มต้นทันที
+  });
+});
+
+//--------------------
+
+function loadQuotes() { 
+    const data = localStorage.getItem('load') //ดึงข้อมูลที่เคยบันทึกไว้ใน localStorage ภายใต้ชื่อ key "load" (ถ้ามีข้อมูลจะได้เป็น string)
+    if (!data) return //ถ้าไม่มีข้อมูลใน localStorage -> ออกจากฟังก์ชันทันที
+    try { //ใส่ใน try เพื่อกัน error ถ้า JSON ใน localStorage เสียหรือไม่ถูก
+      const parsedQuotes = JSON.parse(data) //ใช้ JSON.parse()แปลงstringที่ดึงมา ให้กลายเป็น array ของ obj จริงในjs
+      parsedQuotes.forEach( e => {
+        if( !e.content || !e.author ) return //ถ้าไม่มี จะ return เพื่อข้าม element นั้น
+        addQuote(e.content , e.author) //ถ้ามีครบ -> เรียก addQuote(e.content, e.author) เพื่อเพิ่มกลับเข้า array quotes
+      })
+      quotes = getAllQuotes()
+      renderQuotes() //ใช้เพื่ออัปเดตหน้าจอ(DOM) ให้แสดงquoteทั้งหมดอีกครั้งนึง
+    } catch (e) {
+      console.log(" Error parsing data" , e) //ถ้าJSON.parse() หรือขั้นตอนข้างในเกิดerror -> จะจับ error แล้วพิมพ์ในconsoleเพื่อ debug
+    }
+  }
+  
+  function saveQuotes() {
+    const data = getAllQuotes()
+    if (!data) return //ถ้าไม่มีข้อมูลเลย เช่นไม่ได้เขียนquoteอะไรเข้าไป -> ออกจากฟังก์ชัน ไม่ต้องทำอะไร
+    if(data.length === 0) localStorage.removeItem('load') //ถ้าarrayว่าง(ไม่มีquoteเหลือ) -> ลบข้อมูลใน localStorage ออกเลย เพื่อไม่ให้ค้าง
+    const parsedQuotes = JSON.stringify(data) //แปลงarray ของobj ให้เป็น JSON string เพื่อเก็บใน localStorage
+    localStorage.setItem('load', parsedQuotes) //เก็บstring ที่ได้ใน localStorage ภายใต้ key "load" -> เพื่อให้ข้อมูลนี้ยังอยู่แม้refreshหรือปิดbrowser
+  }
